@@ -2,8 +2,7 @@ import os
 import cv2 
 import math
 import argparse
-import numpy as np 
-from model_3d import *
+import numpy as np
 
 def my_calibration(sz):
     """
@@ -94,8 +93,8 @@ def detect_boundingbox(filemodel,frame,MIN_MATCHES):
     # extract feature orb and matching by Brute Force
     orb = cv2.ORB_create() 
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-    dir_name = os.getcwd()
-    model = cv2.imread(os.path.join(dir_name, filemodel), 0)
+    model = cv2.imread(filemodel, 0)
+    # print(model)
     # Compute model keypoints and its descriptors
     kp_model, des_model = orb.detectAndCompute(model, None)
     kp_frame, des_frame = orb.detectAndCompute(frame, None)
