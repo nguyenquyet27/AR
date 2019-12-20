@@ -22,7 +22,7 @@ def main():
     while True:
         ret, frame = cap.read()
         img2 = pf.image_proc(frame, 0.5)
-        print(frame.shape)
+        # print(frame.shape)
         if not ret:
             print ("Unable to capture video")
             return 
@@ -33,7 +33,7 @@ def main():
             src_pts = np.float32([kp_model[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
             dst_pts = np.float32([kp_frame[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
             homography, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
-            h, w = model.shape
+            h, w = img1.shape
             pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
             dst = cv2.perspectiveTransform(pts, homography)
             # frame = cv2.polylines(frame, [np.int32(dst)], True, 255, 3, cv2.LINE_AA)
@@ -41,7 +41,7 @@ def main():
                 try:
                     # obtain 3D projection matrix from homography matrix and camera parameters
                     projection = pf.projection_matrix(camera_parameters, homography) 
-                    print("projection", projection) 
+                    # print("projection", projection) 
                     # project cube or model
                     frame = pf.render(frame, obj, projection, model, False)
                 except:
