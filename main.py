@@ -14,7 +14,7 @@ def main():
     orb = cv2.ORB_create()
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-    model = cv2.imread('template/joker.jpg', 0)
+    model = cv2.imread('template/joker.jpg')
     obj = OBJ('models/fox.obj',swapyz=True)
     img1 = pf.image_proc(model, 0.5)
     kp_model, des_model = orb.detectAndCompute(img1, None)
