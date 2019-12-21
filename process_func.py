@@ -63,12 +63,6 @@ def projection_matrix(camera_parameters, homography):
     rot_1 = col_1 / l
     rot_2 = col_2 / l
     translation = col_3 / l
-    # compute the orthonormal basis
-    c = rot_1 + rot_2
-    p = np.cross(rot_1, rot_2)
-    d = np.cross(c, p)
-    rot_1 = np.dot(c / np.linalg.norm(c, 2) + d / np.linalg.norm(d, 2), 1 / math.sqrt(2))
-    rot_2 = np.dot(c / np.linalg.norm(c, 2) - d / np.linalg.norm(d, 2), 1 / math.sqrt(2))
     rot_3 = np.cross(rot_1, rot_2)
     # finally, compute the 3D projection matrix from the model to the current frame
     projection = np.stack((rot_1, rot_2, rot_3, translation)).T

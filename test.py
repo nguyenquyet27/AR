@@ -97,7 +97,7 @@ from pygame.constants import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-MIN_MATCHES = 200
+MIN_MATCHES = 120
 def main():
     """
     This functions loads the target surface image,
