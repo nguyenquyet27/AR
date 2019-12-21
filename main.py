@@ -4,6 +4,11 @@ import process_func as pf
 from objloader_simple import *
 import math
 
+from pygame.locals import *
+from pygame.constants import *
+from OpenGL.GL import *
+from OpenGL.GLU import *
+
 MIN_MATCHES = 220
 def main():
     """
@@ -15,7 +20,25 @@ def main():
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
     model = cv2.imread('template/joker.jpg')
-    obj = OBJ('models/fox.obj',swapyz=True)
+
+        
+    pygame.init()
+    viewport = (800,600)
+    hx = viewport[0]/2
+    hy = viewport[1]/2
+    srf = pygame.display.set_mode(viewport, OPENGL | DOUBLEBUF)
+
+    glLightfv(GL_LIGHT0, GL_POSITION,  (-40, 200, 100, 0.0))
+    glLightfv(GL_LIGHT0, GL_AMBIENT, (0.2, 0.2, 0.2, 1.0))
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, (0.5, 0.5, 0.5, 1.0))
+    glEnable(GL_LIGHT0)
+    glEnable(GL_LIGHTING)
+    glEnable(GL_COLOR_MATERIAL)
+    glEnable(GL_DEPTH_TEST)
+    glShadeModel(GL_SMOOTH)           # most obj files expect to be smooth-shaded
+
+    # LOAD OBJECT AFTER PYGAME INIT
+    obj = OBJ('models/11571_Gingerbread_cookie_male_V2_l2.obj',swapyz=True)
     img1 = pf.image_proc(model, 0.5)
     kp_model, des_model = orb.detectAndCompute(img1, None)
     cap = cv2.VideoCapture(0)
