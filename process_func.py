@@ -31,13 +31,13 @@ def image_proc(img,scale_factor):
     lum_seg[lum_clean==0] = 255
 
     # Gaussian smoothing of the lines
-    lum_seg = cv2.GaussianBlur(lum_seg,(3,3),1)
+    # lum_seg = cv2.GaussianBlur(lum_seg,(3,3),1)
     lum_seg = cv2.medianBlur(lum_seg,3)
     return lum_seg
 
 # Compute the homography
 def computeHomography(src_pts, dst_pts):
-    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 10.0)
 
     return M
 
@@ -93,12 +93,12 @@ def render(img, obj, projection, model, color):
         dst = cv2.perspectiveTransform(points.reshape(-1, 1, 3), projection) 
         imgpts = np.int32(dst) 
         if color is False: 
-            cv2.fillConvexPoly(img, imgpts, (255, 0, 0)) 
-        else:
-            color = face[2]
-            # color = color[::-1]  # reverse 
-            # cv2.fillConvexPoly(img, imgpts, color)
             cv2.fillConvexPoly(img, imgpts, (255, c+100, c)) 
+        else:
+            # print (face)
+            color = hex_to_rgb(face[-1])
+            color = color[::-1]  # reverse
+            cv2.fillConvexPoly(img, imgpts, color)
     return img
 
 def hex_to_rgb(hex_color):
