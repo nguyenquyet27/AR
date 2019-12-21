@@ -4,7 +4,7 @@ import process_func as pf
 from objloader_simple import *
 import math
 
-MIN_MATCHES = 100
+MIN_MATCHES = 220
 def main():
     """
     This functions loads the target surface image,
@@ -19,6 +19,7 @@ def main():
     img1 = pf.image_proc(model, 0.5)
     kp_model, des_model = orb.detectAndCompute(img1, None)
     cap = cv2.VideoCapture(0)
+
     while True:
         ret, frame = cap.read()
         img2 = pf.image_proc(frame, 0.5)
@@ -29,6 +30,7 @@ def main():
         kp_frame, des_frame = orb.detectAndCompute(img2, None)
         matches = bf.match(des_model, des_frame)
         matches = sorted(matches, key=lambda x: x.distance)
+
         if (len(matches) > MIN_MATCHES):
             src_pts = np.float32([kp_model[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
             dst_pts = np.float32([kp_frame[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
@@ -40,10 +42,9 @@ def main():
             if homography is not None:
                 try:
                     # obtain 3D projection matrix from homography matrix and camera parameters
-                    projection = pf.projection_matrix(camera_parameters, homography) 
-                    # print("projection", projection) 
+                    projection = pf.projection_matrix(camera_parameters, homography)
                     # project cube or model
-                    frame = pf.render(frame, obj, projection, model, False)
+                    frame = pf.render(frame, obj, projection, img1, True)
                 except:
                     pass
             
