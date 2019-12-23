@@ -7,13 +7,13 @@ from .obj import OBJModel
 from .preprocess import image_proc
 
 calibration_matrix = np.array(
-    [[800, 0, 640],
-     [0, 800, 360],
+    [[600, 0, 640],
+     [0, 600, 360],
      [0, 0, 1]])
 
 MIN_MATCHES = 50
 
-model = cv2.imread(os.path.join(settings.BASE_DIR, 'src/ref/joker.jpg'), 0)
+model = cv2.imread(os.path.join(settings.BASE_DIR, 'src/ref/joker.jpg'))
 model_height, model_width = model.shape
 points = np.float32(
     [[0, 0],
@@ -29,4 +29,4 @@ orb = cv2.ORB_create()
 kp_model, des_model = orb.detectAndCompute(img, None)
 
 obj = OBJModel(os.path.join(settings.BASE_DIR,
-                            'src/models/spider.obj'), swapyz=True)
+                            'src/models/11571_Gingerbread_cookie_male_V2_l2.obj'), swapyz=True)

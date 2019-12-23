@@ -2,10 +2,9 @@ import cv2
 import numpy as np
 
 
-def image_proc(img, scale_factor=0.5):
-    """
-        Process input image to match the original line drawing
-    """
+# Process input image to match the original line drawing
+def image_proc(img, scale_factor):
+
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
 
@@ -34,6 +33,6 @@ def image_proc(img, scale_factor=0.5):
     lum_seg[lum_clean == 0] = 255
 
     # Gaussian smoothing of the lines
-    lum_seg = cv2.GaussianBlur(lum_seg, (3, 3), 1)
+    # lum_seg = cv2.GaussianBlur(lum_seg,(3,3),1)
     lum_seg = cv2.medianBlur(lum_seg, 3)
     return lum_seg
