@@ -24,9 +24,18 @@ def main():
     # search_params = dict(checks=50)
     # flann = cv2.FlannBasedMatcher(index_params)
     ## For SURF
-    minHessian = 400
-    detector = cv2.xfeatures2d_SURF.create(hessianThreshold=minHessian)
-    flann = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
+    # minHessian = 400
+    # detector = cv2.xfeatures2d_SURF.create(hessianThreshold=minHessian)
+    # flann = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
+    ## For ORB
+    detector = cv2.ORB_create()
+    FLANN_INDEX_KDTREE = 1
+    FLANN_INDEX_LSH    = 6
+    index_params= dict(algorithm = FLANN_INDEX_LSH,
+                   table_number = 6, # 12
+                   key_size = 12,     # 20
+                   multi_probe_level = 1) #2
+    flann = cv2.FlannBasedMatcher(index_params)
     model = cv2.imread('template/joker.jpg')
     obj = OBJ('models/fox.obj',swapyz=True)
     img1 = pf.image_proc(model, 1)
