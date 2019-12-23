@@ -1,73 +1,76 @@
 import cv2
 import numpy as np
+
+from ar_model import ARModel
+import config
 import process_func as pf
-from objloader_simple import *
-import math
 
-from pygame.locals import *
-from pygame.constants import *
-from OpenGL.GL import *
-from OpenGL.GLU import *
 
-MIN_MATCHES = 100
-def main():
-    """
-    This functions loads the target surface image,
-    """
-    homography = None 
-    camera_parameters = np.array([[600, 0, 320], [0, 600, 240], [0, 0, 1]])
-    orb = cv2.ORB_create()
-    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+def project_3d_model_to_target_plane(ref, target):
+    target.set_homography(ref)
 
-    model = cv2.imread('template/joker.jpg')
-    obj = OBJ('models/fox.obj',swapyz=True)
-    img1 = pf.image_proc(model, 1)
-    kp_model, des_model = orb.detectAndCompute(img1, None)
-    cap = cv2.VideoCapture(0)
+    points = np.float32(
+        [[0, 0],
+         [0, ref.height - 1],
+         [ref.width - 1, ref.height - 1],
+         [ref.width - 1, 0]]
+    ).reshape(-1, 1, 2)
+
+    dst = cv2.perspectiveTransform(points, target.get_homography())
+
+    frame = cv2.polylines(
+        target.target, [np.int32(dst)], True, (255, 255, 255), 3, cv2.LINE_AA)
+    if target.get_homography() is not None:
+        try:
+            # obtain 3D projection matrix from homography matrix and camera parameters
+            projection = pf.projection_matrix(
+                config.camera_intrinsic, target.get_homography())
+            # project cube or model
+            frame = pf.render(frame, config._3d_fox,
+                              projection, ref.image_ref, False)
+        except:
+            pass
+
+    return frame
+
+
+if __name__ == "__main__":
+    import argparse
+
+    # Parse command line arguments
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-vb', default=str(0),
+                    help="lookup cv2.VideoCapture for video backend parameters")
+    args = ap.parse_args()
+
+    cap = cv2.VideoCapture(int(args.vb))
+
+    # Check if camera opened successfully
+    if (cap.isOpened() == False):
+        print("Error opening video stream.")
 
     while True:
-        ret, frame = cap.read()
-        img2 = pf.image_proc(frame, 1)
-        # print(frame.shape)
-        if not ret:
-            print ("Unable to capture video")
-            return 
-        kp_frame, des_frame = orb.detectAndCompute(img2, None)
-        if (des_frame is None): 
-            cv2.imshow('frame', frame)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+        ret, frame_read = cap.read()
+
+        target = ARModel(config.joker, frame_read)
+        cv2.imshow('After process', target.target_after)
+
+        if target.get_descriptors() is None:
+            cv2.imshow('Frame', frame_read)
+            if cv2.waitKey(50) == 27:
                 break
             continue
-        matches = bf.match(des_model, des_frame)
-        matches = sorted(matches, key=lambda x: x.distance)
 
-        if (len(matches) > MIN_MATCHES):
-            src_pts = np.float32([kp_model[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
-            dst_pts = np.float32([kp_frame[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
-            homography = pf.computeHomography(src_pts ,dst_pts)
-            h, w = img1.shape
-            pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
-            dst = cv2.perspectiveTransform(pts, homography)
-            # frame = cv2.polylines(frame, [np.int32(dst)], True, 255, 3, cv2.LINE_AA)
-            if homography is not None:
-                try:
-                    # obtain 3D projection matrix from homography matrix and camera parameters
-                    projection = pf.projection_matrix(camera_parameters, homography)
-                    # project cube or model
-                    frame = pf.render(frame, obj, projection, img1, False)
-                except:
-                    pass
-            
+        if len(target.get_matches()) > config.MIN_MATCHES:
+            frame_read = project_3d_model_to_target_plane(config.joker, target)
+            # print(target.get_homography())
         else:
-            print ("Not enough matches found - %d/%d" % (len(matches), MIN_MATCHES)) 
-        
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+            print('Not enough matches found - {}/{}'.format(
+                len(target.get_matches()), config.MIN_MATCHES))
+
+        cv2.imshow('Frame', frame_read)
+        if cv2.waitKey(50) == 27:
             break
 
     cap.release()
     cv2.destroyAllWindows()
-    return 0
-
-if __name__ == '__main__':
-    main()

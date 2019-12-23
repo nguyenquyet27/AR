@@ -3,21 +3,26 @@ import math
 import numpy as np
 import random
 
-# Process input image to match the original line drawing
-def image_proc(img,scale_factor):
 
+def image_proc(img, scale_factor):
+    """
+        Process input image to match the original line drawing
+    """
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
 
-    #Luminance channel of HSV image
-    lum = img_hsv[:,:,2]
+    # Luminance channel of HSV image
+    lum = img_hsv[:, :, 2]
 
-    #Adaptive thresholding
-    lum_thresh = cv2.adaptiveThreshold(lum,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY_INV,11,15)
+    # Adaptive thresholding
+    lum_thresh = cv2.adaptiveThreshold(
+        lum, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 15)
 
-    #Remove all small connected components
-    nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(lum_thresh, connectivity=8)
-    sizes = stats[1:, -1]; nb_components = nb_components - 1
+    # Remove all small connected components
+    nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(
+        lum_thresh, connectivity=8)
+    sizes = stats[1:, -1]
+    nb_components = nb_components - 1
     min_size = 90*scale_factor
 
     lum_clean = np.zeros((output.shape))
@@ -27,24 +32,14 @@ def image_proc(img,scale_factor):
 
     # use mask to remove all neat outline of original image
     lum_seg = np.copy(lum)
-    lum_seg[lum_clean!=0] = 0
-    lum_seg[lum_clean==0] = 255
+    lum_seg[lum_clean != 0] = 0
+    lum_seg[lum_clean == 0] = 255
 
     # Gaussian smoothing of the lines
     # lum_seg = cv2.GaussianBlur(lum_seg,(3,3),1)
-    lum_seg = cv2.medianBlur(lum_seg,3)
+    lum_seg = cv2.medianBlur(lum_seg, 3)
     return lum_seg
 
-# Compute the homography
-def computeHomography(src_pts, dst_pts):
-    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 10.0)
-
-    return M
-
-# Draw lines for frame boundary
-def draw_frame(img,dst):
-    img = cv2.polylines(img, [np.int32(dst)], True, (255, 0, 0), 3, cv2.LINE_AA)
-    return img
 
 def projection_matrix(camera_parameters, homography):
     """
@@ -68,6 +63,7 @@ def projection_matrix(camera_parameters, homography):
     projection = np.stack((rot_1, rot_2, rot_3, translation)).T
     return np.dot(camera_parameters, projection)
 
+
 def render(img, obj, projection, model, color):
     """
     Render a loaded obj model into the current video frame
@@ -76,24 +72,25 @@ def render(img, obj, projection, model, color):
     scale_matrix = np.eye(3) * 3
     h, w = model.shape
     c = 0
-    for face in obj.faces: 
+    for face in obj.faces:
         c = c + 0.5
-        face_vertices = face[0] 
-        points = np.array([vertices[vertex - 1] for vertex in face_vertices]) 
-        points = np.dot(points, scale_matrix) 
-        # render model in the middle of the reference surface. To do so, 
+        face_vertices = face[0]
+        points = np.array([vertices[vertex - 1] for vertex in face_vertices])
+        points = np.dot(points, scale_matrix)
+        # render model in the middle of the reference surface. To do so,
         # model points must be displaced
-        points = np.array([[p[0] + w / 2, p[1] + h / 2, p[2]] for p in points]) 
-        dst = cv2.perspectiveTransform(points.reshape(-1, 1, 3), projection) 
-        imgpts = np.int32(dst) 
-        if color is False: 
-            cv2.fillConvexPoly(img, imgpts, (255, c+100, c)) 
+        points = np.array([[p[0] + w / 2, p[1] + h / 2, p[2]] for p in points])
+        dst = cv2.perspectiveTransform(points.reshape(-1, 1, 3), projection)
+        imgpts = np.int32(dst)
+        if color is False:
+            cv2.fillConvexPoly(img, imgpts, (255, c+100, c))
         else:
             # print (face)
             color = hex_to_rgb(face[-1])
             color = color[::-1]  # reverse
             cv2.fillConvexPoly(img, imgpts, color)
     return img
+
 
 def hex_to_rgb(hex_color):
     """
@@ -102,4 +99,3 @@ def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
     h_len = len(hex_color)
     return tuple(int(hex_color[i:i + h_len // 3], 16) for i in range(0, h_len, h_len // 3))
-    
