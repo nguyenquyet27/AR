@@ -9,13 +9,13 @@ from pygame.constants import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-MIN_MATCHES = 100
+MIN_MATCHES = 120
 def main():
     """
     This functions loads the target surface image,
     """
     homography = None 
-    camera_parameters = np.array([[600, 0, 320], [0, 600, 240], [0, 0, 1]])
+    camera_parameters = np.array([[800, 0, 320], [0, 800, 240], [0, 0, 1]])
     orb = cv2.ORB_create()
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
