@@ -10,18 +10,23 @@ from pygame.constants import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-MIN_MATCHES = 23
+MIN_MATCHES = 35
 def main():
     """
     This functions loads the target surface image,
     """
     homography = None 
     camera_parameters = np.array([[800, 0, 320], [0, 800, 240], [0, 0, 1]])
-    detector = cv2.xfeatures2d.SIFT_create()
-    FLANN_INDEX_KDTREE = 1
-    index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-    search_params = dict(checks=50)
-    flann = cv2.FlannBasedMatcher(index_params)
+    ## For SIFT
+    # detector = cv2.xfeatures2d.SIFT_create()
+    # FLANN_INDEX_KDTREE = 1
+    # index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+    # search_params = dict(checks=50)
+    # flann = cv2.FlannBasedMatcher(index_params)
+    ## For SURF
+    minHessian = 400
+    detector = cv2.xfeatures2d_SURF.create(hessianThreshold=minHessian)
+    flann = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
     model = cv2.imread('template/joker.jpg')
     obj = OBJ('models/fox.obj',swapyz=True)
     img1 = pf.image_proc(model, 1)

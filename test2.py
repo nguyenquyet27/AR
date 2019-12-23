@@ -10,18 +10,22 @@ from pygame.constants import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-MIN_MATCHES = 23
+MIN_MATCHES = 100
 def main():
     """
     This functions loads the target surface image,
     """
     homography = None 
     camera_parameters = np.array([[800, 0, 320], [0, 800, 240], [0, 0, 1]])
-    detector = cv2.xfeatures2d.SIFT_create()
-    FLANN_INDEX_KDTREE = 1
-    index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-    search_params = dict(checks=50)
-    flann = cv2.FlannBasedMatcher(index_params)
+    # For ORB: NORM_HAMING, NORM_HAMING2
+    detector = cv2.ORB_create()
+    # For SIFT: NORM_L1, NORM_L2
+    # detector = cv2.xfeatures2d.SIFT_create()
+    # For SURF: NORM_L1, NORM_L2
+    # minHessian = 400
+    # detector = cv2.xfeatures2d_SURF.create(hessianThreshold=minHessian)
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
+
     model = cv2.imread('template/joker.jpg')
     obj = OBJ('models/fox.obj',swapyz=True)
     img1 = pf.image_proc(model, 1)
@@ -31,6 +35,7 @@ def main():
     while True:
         ret, frame = cap.read()
         img2 = pf.image_proc(frame, 1)
+        # print(frame.shape)
         if not ret:
             print ("Unable to capture video")
             return 
@@ -41,15 +46,13 @@ def main():
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
             continue
-        matches = flann.knnMatch(des_model, des_frame,k=2)
-        # matches = sorted(matches, key=lambda x: x.distance)
-        matches = [m[0] for m in matches if len(m) == 2 and m[0].distance < m[1].distance * 0.75]
-        print(len(matches))
+        matches = bf.match(des_model, des_frame)
+        matches = sorted(matches, key=lambda x: x.distance)
+
         if (len(matches) > MIN_MATCHES):
             src_pts = np.float32([kp_model[m.queryIdx].pt for m in matches]).reshape(-1, 1, 2)
             dst_pts = np.float32([kp_frame[m.trainIdx].pt for m in matches]).reshape(-1, 1, 2)
             homography = pf.computeHomography(src_pts ,dst_pts)
-            print(homography)
             h, w = img1.shape
             pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
             dst = cv2.perspectiveTransform(pts, homography)
