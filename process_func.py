@@ -15,6 +15,11 @@ def image_proc(img, scale_factor):
     ret, mask = cv2.threshold(edges, 10, 255, cv2.THRESH_BINARY_INV)
     return mask
 
+# Compute the homography
+def computeHomography(src_pts, dst_pts):
+    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 10.0)
+
+    return M
 
 def projection_matrix(camera_parameters, homography):
     

@@ -13,8 +13,8 @@ image_plane_height = 480
 
 # TODO: estimate this
 camera_intrinsic = np.array(
-    [[600, 0, image_plane_width/2],
-     [0, 600, image_plane_height/2],
+    [[800, 0, image_plane_width/2],
+     [0, 800, image_plane_height/2],
      [0, 0, 1]]
 )
 print(camera_intrinsic)
