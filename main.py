@@ -44,6 +44,8 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     cap = cv2.VideoCapture(int(args.vb))
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.image_plane_width)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.image_plane_height)
 
     # Check if camera opened successfully
     if (cap.isOpened() == False):
@@ -61,9 +63,17 @@ if __name__ == "__main__":
                 break
             continue
 
+        # cv2.drawKeypoints(frame_read, target.get_keypoints(),
+            #   target.target, color=(0, 255, 0))
+
         if len(target.get_matches()) > config.MIN_MATCHES:
-            frame_read = project_3d_model_to_target_plane(config.joker, target)
-            # print(target.get_homography())
+            frame_read = project_3d_model_to_target_plane(
+                config.joker, target)
+
+            # frame_matches = cv2.drawMatches(config.joker.ref_plane, config.joker.get_keypoints(), frame_read,
+            #                                 target.get_keypoints(), target.get_matches()[:10], 0, flags=2)
+            # cv2.imshow('After matches', frame_matches)
+
         else:
             print('Not enough matches found - {}/{}'.format(
                 len(target.get_matches()), config.MIN_MATCHES))

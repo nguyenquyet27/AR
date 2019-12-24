@@ -50,7 +50,6 @@ class ARModel(object):
         """
             set homography for target surface object which transform [X,Y,0,1].tranpose to z[u,v,1].transpose
         """
-
         ref_kp = reference_plane.get_keypoints()
 
         src_points = np.float32(
