@@ -5,53 +5,25 @@ import random
 
 
 def image_proc(img, scale_factor):
-    """
-        Process input image to match the original line drawing
-    """
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
-
-    # Luminance channel of HSV image
-    lum = img_hsv[:, :, 2]
-
-    # Adaptive thresholding
-    lum_thresh = cv2.adaptiveThreshold(
-        lum, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 11, 15)
-
-    # Remove all small connected components
-    nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(
-        lum_thresh, connectivity=8)
-    sizes = stats[1:, -1]
-    nb_components = nb_components - 1
-    min_size = 90*scale_factor
-
-    lum_clean = np.zeros((output.shape))
-    for i in range(0, nb_components):
-        if sizes[i] >= min_size:
-            lum_clean[output == i + 1] = 255
-
-    # use mask to remove all neat outline of original image
-    lum_seg = np.copy(lum)
-    lum_seg[lum_clean != 0] = 0
-    lum_seg[lum_clean == 0] = 255
-
-    # Gaussian smoothing of the lines
-    # lum_seg = cv2.GaussianBlur(lum_seg,(3,3),1)
-    lum_seg = cv2.medianBlur(lum_seg, 3)
-    return lum_seg
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    kernel = np.ones((3,3), np.uint8)
+    img_gray = cv2.dilate(img_gray, kernel, iterations=1)
+    
+    img_gray = cv2.medianBlur(img_gray, 5)
+    
+    edges = cv2.Laplacian(img_gray, cv2.CV_8U)
+    ret, mask = cv2.threshold(edges, 10, 255, cv2.THRESH_BINARY_INV)
+    return mask
 
 
 def projection_matrix(camera_parameters, homography):
-    """
-    From the camera calibration matrix and the estimated homography
-    compute the 3D projection matrix
-    """
+    
     # Compute rotation along the x and y axis as well as the translation
     homography = homography * (-1)
     rot_and_transl = np.dot(np.linalg.inv(camera_parameters), homography)
     col_1 = rot_and_transl[:, 0]
     col_2 = rot_and_transl[:, 1]
-    # print("col_2",col_2)
+    
     col_3 = rot_and_transl[:, 2]
     # normalise vectors
     l = math.sqrt(np.linalg.norm(col_1, 2) * np.linalg.norm(col_2, 2))
@@ -59,7 +31,7 @@ def projection_matrix(camera_parameters, homography):
     rot_2 = col_2 / l
     translation = col_3 / l
     rot_3 = np.cross(rot_1, rot_2)
-    # finally, compute the 3D projection matrix from the model to the current frame
+    
     projection = np.stack((rot_1, rot_2, rot_3, translation)).T
     return np.dot(camera_parameters, projection)
 

@@ -1,9 +1,10 @@
 import os
 import numpy as np
+import cv2
 
 from reference_plane import ReferencePlane
 from objloader_simple import OBJ
-MIN_MATCHES = 120
+MIN_MATCHES = 150
 
 
 image_plane_width = 640
@@ -19,9 +20,9 @@ camera_intrinsic = np.array(
 print(camera_intrinsic)
 
 
-joker = ReferencePlane('template/joker.jpg')
+joker = ReferencePlane('template/pike.jpg')
+cv2.imshow('joker', joker.image_ref)
 judgement = ReferencePlane('template/judgement.jpg')
 bookmark = ReferencePlane('template/bookmark.jpg')
 
-# TODO cai swapyxz lam gi vay?
 _3d_fox = OBJ('models/fox.obj', swapyz=True)

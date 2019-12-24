@@ -5,8 +5,8 @@ from ar_model import ARModel
 import config
 import process_func as pf
 
-
 def project_3d_model_to_target_plane(ref, target):
+    global count, projection
     target.set_homography(ref)
 
     points = np.float32(
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     # Check if camera opened successfully
     if (cap.isOpened() == False):
         print("Error opening video stream.")
-
+    
     while True:
         ret, frame_read = cap.read()
 
@@ -65,10 +65,9 @@ if __name__ == "__main__":
         target.set_matches(config.joker)
 
         cv2.imshow('After process', target.target_after)
-
+        
         # cv2.drawKeypoints(frame_read, target.get_keypoints(),
         #   target.target, color=(0, 255, 0))
-
         if len(target.get_matches()) > config.MIN_MATCHES:
             frame_read = project_3d_model_to_target_plane(
                 config.joker, target)

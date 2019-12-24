@@ -36,9 +36,7 @@ class ARModel(object):
         return self.descriptors
 
     def set_matches(self, reference_plane):
-        """
-
-        """
+        
         self.matches = self.bf.match(
             reference_plane.descriptors, self.descriptors)
         self.matches = sorted(self.matches, key=lambda x: x.distance)
@@ -58,7 +56,7 @@ class ARModel(object):
             [self.keypoints[m.trainIdx].pt for m in self.matches]).reshape(-1, 1, 2)
 
         # TODO so 4.0 do lam gi vay?
-        H, mask = cv2.findHomography(src_points, dst_points, cv2.RANSAC, 4.0)
+        H, mask = cv2.findHomography(src_points, dst_points, cv2.RANSAC, 10.0)
 
         self.homography = H
 
