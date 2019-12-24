@@ -6,11 +6,18 @@ from ar_model import ARModel
 import config
 import process_func as pf
 
-count = 0
+kt = 0
 projection = None
+homograp = np.ones((3,3))
 def project_3d_model_to_target_plane(ref, target):
-    global count, projection
+    global kt, projection, homograp
     target.set_homography(ref)
+    if kt==0:
+        homograp = target.get_homography()
+    else:
+        homograp = (target.get_homography()+homograp)/2
+        # homograp = target.get_homography()
+        kt = 1
 
     points = np.float32(
         [[0, 0],
@@ -19,17 +26,16 @@ def project_3d_model_to_target_plane(ref, target):
          [ref.width - 1, 0]]
     ).reshape(-1, 1, 2)
 
-    dst = cv2.perspectiveTransform(points, target.get_homography())
-
+    dst = cv2.perspectiveTransform(points, homograp)
+    
     frame = cv2.polylines(
         target.target, [np.int32(dst)], True, (255, 255, 255), 3, cv2.LINE_AA)
-    if target.get_homography() is not None:
+    # frame = target.target
+    if homograp is not None:
         try:
             # obtain 3D projection matrix from homography matrix and camera parameters
-            if count == 2:
-                projection = pf.projection_matrix(
-                    config.camera_intrinsic, target.get_homography())
-                count = 0
+            projection = pf.projection_matrix(
+                config.camera_intrinsic, homograp)
             # project cube or model
             frame = pf.render(frame, config._3d_fox,
                               projection, ref.image_ref, False)
@@ -74,7 +80,6 @@ if __name__ == "__main__":
         # cv2.drawKeypoints(frame_read, target.get_keypoints(),
         #   target.target, color=(0, 255, 0))       
         if len(target.get_matches()) > config.MIN_MATCHES:
-            count +=1
             frame_read = project_3d_model_to_target_plane(
                 config.joker, target)
 
@@ -83,7 +88,6 @@ if __name__ == "__main__":
             # cv2.imshow('After matches', frame_matches)
 
         else:
-            count = 0
             print('Not enough matches found - {}/{}'.format(
                 len(target.get_matches()), config.MIN_MATCHES))
 
