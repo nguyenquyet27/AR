@@ -24,7 +24,7 @@ class ARModel(object):
         # self.keypoints, self.descriptors = self.orb.detectAndCompute(
         #     self.target_after, None)
         self.keypoints, self.descriptors = self.sift.detectAndCompute(self.target_after, None)
-        self.set_matches(reference_plane)
+        # self.set_matches(reference_plane)
 
     def set_preprocess_target(self):
         self.target_after = pf.image_proc(self.target, 1)
