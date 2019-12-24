@@ -6,7 +6,8 @@ from ar_model import ARModel
 import config
 import process_func as pf
 
-
+count = 0
+projection = None
 def project_3d_model_to_target_plane(ref, target):
     global count, projection
     target.set_homography(ref)
@@ -25,8 +26,10 @@ def project_3d_model_to_target_plane(ref, target):
     if target.get_homography() is not None:
         try:
             # obtain 3D projection matrix from homography matrix and camera parameters
-            projection = pf.projection_matrix(
-                config.camera_intrinsic, target.get_homography())
+            if count == 2:
+                projection = pf.projection_matrix(
+                    config.camera_intrinsic, target.get_homography())
+                count = 0
             # project cube or model
             frame = pf.render(frame, config._3d_fox,
                               projection, ref.image_ref, False)
@@ -69,8 +72,9 @@ if __name__ == "__main__":
         cv2.imshow('After process', target.target_after)
 
         # cv2.drawKeypoints(frame_read, target.get_keypoints(),
-        #   target.target, color=(0, 255, 0))
+        #   target.target, color=(0, 255, 0))       
         if len(target.get_matches()) > config.MIN_MATCHES:
+            count +=1
             frame_read = project_3d_model_to_target_plane(
                 config.joker, target)
 
@@ -79,6 +83,7 @@ if __name__ == "__main__":
             # cv2.imshow('After matches', frame_matches)
 
         else:
+            count = 0
             print('Not enough matches found - {}/{}'.format(
                 len(target.get_matches()), config.MIN_MATCHES))
 
