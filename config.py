@@ -23,14 +23,11 @@ camera_intrinsic = np.array(
 
 joker = ReferencePlane('template/pike.jpg')
 cv2.imshow('joker', joker.image_ref)
-judgement = ReferencePlane('template/judgement.jpg')
-bookmark = ReferencePlane('template/bookmark.jpg')
 
 _3d_fox = OBJ('models/fox.obj', swapyz=True)
 
 
 # ORB + FLANN
-FLANN_INDEX_KDTREE = 1
 FLANN_INDEX_LSH = 6
 index_params = dict(algorithm=FLANN_INDEX_LSH,
                     table_number=6,  # 12
