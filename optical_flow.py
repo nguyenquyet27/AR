@@ -1,5 +1,4 @@
 import cv2
-import time
 import numpy as np
 
 from ar_model import ARModel
@@ -8,7 +7,6 @@ import process_func as pf
 
 
 def project_3d_model_to_target_plane(ref, target):
-    global count, projection
     target.set_homography(ref)
 
     points = np.float32(
@@ -70,6 +68,7 @@ if __name__ == "__main__":
 
         # cv2.drawKeypoints(frame_read, target.get_keypoints(),
         #   target.target, color=(0, 255, 0))
+
         if len(target.get_matches()) > config.MIN_MATCHES:
             frame_read = project_3d_model_to_target_plane(
                 config.joker, target)

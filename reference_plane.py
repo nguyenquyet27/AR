@@ -17,10 +17,10 @@ class ReferencePlane(object):
         self.image_ref = image_proc(self.ref_plane, 1)
         self.height, self.width = self.image_ref.shape
 
-        # self.keypoints, self.descriptors = self.orb.detectAndCompute(
-        #     self.image_ref, None)
-        self.keypoints, self.descriptors = self.sift.detectAndCompute(
+        self.keypoints, self.descriptors = self.orb.detectAndCompute(
             self.image_ref, None)
+        # self.keypoints, self.descriptors = self.sift.detectAndCompute(
+        #     self.image_ref, None)
 
     def get_keypoints(self):
         return self.keypoints

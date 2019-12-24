@@ -3,8 +3,9 @@ import numpy as np
 
 import process_func as pf
 FLANN_INDEX_KDTREE = 1
-index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
 search_params = dict(checks=50)
+
 
 class ARModel(object):
     """
@@ -21,10 +22,9 @@ class ARModel(object):
         self.flann = cv2.FlannBasedMatcher(index_params, search_params)
         self.target = target_plane
         self.set_preprocess_target()
-        # self.keypoints, self.descriptors = self.orb.detectAndCompute(
-        #     self.target_after, None)
-        self.keypoints, self.descriptors = self.sift.detectAndCompute(self.target_after, None)
-        # self.set_matches(reference_plane)
+        self.keypoints, self.descriptors = self.orb.detectAndCompute(
+            self.target_after, None)
+        # self.keypoints, self.descriptors = self.sift.detectAndCompute(self.target_after, None)
 
     def set_preprocess_target(self):
         self.target_after = pf.image_proc(self.target, 1)
@@ -45,8 +45,10 @@ class ARModel(object):
         # self.matches = self.bf.match(
         #     reference_plane.descriptors, self.descriptors)
         # self.matches = sorted(self.matches, key=lambda x: x.distance)
-        self.matches = self.flann.knnMatch(reference_plane.descriptors, self.descriptors,k=2)
-        self.matches = [m[0] for m in self.matches if len(m) == 2 and m[0].distance < m[1].distance * 0.75]
+        self.matches = self.flann.knnMatch(
+            reference_plane.descriptors, self.descriptors, k=2)
+        self.matches = [m[0] for m in self.matches if len(
+            m) == 2 and m[0].distance < m[1].distance * 0.75]
 
     def get_matches(self):
         return self.matches

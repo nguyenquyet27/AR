@@ -6,29 +6,24 @@ import random
 
 def image_proc(img, scale_factor):
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    kernel = np.ones((3,3), np.uint8)
+    kernel = np.ones((3, 3), np.uint8)
     img_gray = cv2.dilate(img_gray, kernel, iterations=1)
-    
+
     img_gray = cv2.medianBlur(img_gray, 5)
-    
+
     edges = cv2.Laplacian(img_gray, cv2.CV_8U)
     ret, mask = cv2.threshold(edges, 10, 255, cv2.THRESH_BINARY_INV)
     return mask
 
-# Compute the homography
-def computeHomography(src_pts, dst_pts):
-    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 10.0)
-
-    return M
 
 def projection_matrix(camera_parameters, homography):
-    
+
     # Compute rotation along the x and y axis as well as the translation
     homography = homography * (-1)
     rot_and_transl = np.dot(np.linalg.inv(camera_parameters), homography)
     col_1 = rot_and_transl[:, 0]
     col_2 = rot_and_transl[:, 1]
-    
+
     col_3 = rot_and_transl[:, 2]
     # normalise vectors
     l = math.sqrt(np.linalg.norm(col_1, 2) * np.linalg.norm(col_2, 2))
@@ -36,7 +31,7 @@ def projection_matrix(camera_parameters, homography):
     rot_2 = col_2 / l
     translation = col_3 / l
     rot_3 = np.cross(rot_1, rot_2)
-    
+
     projection = np.stack((rot_1, rot_2, rot_3, translation)).T
     return np.dot(camera_parameters, projection)
 
