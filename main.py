@@ -55,7 +55,6 @@ if __name__ == "__main__":
         ret, frame_read = cap.read()
 
         target = ARModel(config.joker, frame_read)
-        cv2.imshow('After process', target.target_after)
 
         if target.get_descriptors() is None:
             cv2.imshow('Frame', frame_read)
@@ -63,8 +62,12 @@ if __name__ == "__main__":
                 break
             continue
 
+        target.set_matches(config.joker)
+
+        cv2.imshow('After process', target.target_after)
+
         # cv2.drawKeypoints(frame_read, target.get_keypoints(),
-            #   target.target, color=(0, 255, 0))
+        #   target.target, color=(0, 255, 0))
 
         if len(target.get_matches()) > config.MIN_MATCHES:
             frame_read = project_3d_model_to_target_plane(
