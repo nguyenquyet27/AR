@@ -67,6 +67,8 @@ class ARModel(object):
 
         self.homography = H
 
+        return dst_points
+
     def get_homography(self):
         try:
             return self.homography
