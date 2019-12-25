@@ -66,14 +66,15 @@ if __name__ == "__main__":
         ret, frame_read = cap.read()
 
         target = ARModel(config.joker, frame_read)
-
+        target2 = ARModel(config.joker2, frame_read)
         if target.get_descriptors() is None:
             cv2.imshow('Frame', frame_read)
             if cv2.waitKey(50) == 27:
                 break
             continue
-
+        frame_read2 = frame_read
         target.set_matches(config.joker)
+        target2.set_matches(config.joker2)
 
         cv2.imshow('After process', target.target_after)
 
@@ -82,14 +83,15 @@ if __name__ == "__main__":
         if len(target.get_matches()) > config.MIN_MATCHES:
             frame_read = project_3d_model_to_target_plane(
                 config.joker, target)
-
+        if len(target2.get_matches()) > config.MIN_MATCHES:
+            frame_read2 = project_3d_model_to_target_plane(
+                config.joker2, target2)
             # frame_matches = cv2.drawMatches(config.joker.ref_plane, config.joker.get_keypoints(), frame_read,
             #                                 target.get_keypoints(), target.get_matches()[:10], 0, flags=2)
             # cv2.imshow('After matches', frame_matches)
-
-        else:
-            print('Not enough matches found - {}/{}'.format(
-                len(target.get_matches()), config.MIN_MATCHES))
+        cv2.addWeighted(frame_read,0.5,frame_read2,0.5,0)
+        print('Not enough matches found - {}/{}'.format(
+        len(target.get_matches()), config.MIN_MATCHES))
 
         cv2.imshow('Frame', frame_read)
         if cv2.waitKey(50) == 27:

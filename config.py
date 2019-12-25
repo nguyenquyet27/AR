@@ -5,10 +5,10 @@ import cv2
 from reference_plane import ReferencePlane
 from objloader_simple import OBJ
 
-MIN_MATCHES = 15
+MIN_MATCHES = 30
 
 
-image_plane_width = 640
+image_plane_width = 1280
 image_plane_height = 480
 
 
@@ -22,6 +22,8 @@ camera_intrinsic = np.array(
 
 
 joker = ReferencePlane('template/joker.jpg')
+joker2 = ReferencePlane('template/joker2.jpg')
+pike = ReferencePlane('template/pike.jpg')
 cv2.imshow('joker', joker.image_ref)
 
 _3d_fox = OBJ('models/fox.obj', swapyz=True)

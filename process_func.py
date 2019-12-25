@@ -6,7 +6,7 @@ import random
 
 def image_proc(img, scale_factor):
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    kernel = np.ones((3, 3), np.uint8)
+    # kernel = np.ones((3, 3), np.uint8)
     # img_gray = cv2.dilate(img_gray, kernel, iterations=1)
 
     # img_gray = cv2.medianBlur(img_gray, 5)
