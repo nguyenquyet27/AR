@@ -23,7 +23,6 @@ camera_intrinsic = np.array(
 
 joker = ReferencePlane('template/joker.jpg')
 joker2 = ReferencePlane('template/joker2.jpg')
-pike = ReferencePlane('template/pike.jpg')
 cv2.imshow('joker', joker.image_ref)
 
 _3d_fox = OBJ('models/fox.obj', swapyz=True)
