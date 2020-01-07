@@ -2,6 +2,7 @@ import cv2
 import os
 
 from process_func import image_proc
+import config
 
 
 class ReferencePlane(object):
@@ -13,7 +14,7 @@ class ReferencePlane(object):
         # TODO: using more planar
         self.ref_plane = cv2.imread(os.path.join(os.getcwd(), plane_path))
 
-        self.image_ref = image_proc(self.ref_plane, 1)
+        self.image_ref = image_proc(cv2.resize(self.ref_plane, (150,300)), 1)
         self.height, self.width = self.image_ref.shape
 
         self.keypoints, self.descriptors = self.orb.detectAndCompute(
