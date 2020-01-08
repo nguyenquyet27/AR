@@ -54,7 +54,7 @@ if __name__ == "__main__":
     ap.add_argument('-vb', default=str(0),
                     help="lookup cv2.VideoCapture for video backend parameters")
     args = ap.parse_args()
-    start_time = time.time()
+    
     cap = cv2.VideoCapture(int(args.vb))
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.image_plane_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.image_plane_height)
@@ -64,6 +64,7 @@ if __name__ == "__main__":
         print("Error opening video stream.")
 
     while True:
+        start_time = time.time()
         ret, frame_read = cap.read()
 
         target = ARModel(config.joker, frame_read)

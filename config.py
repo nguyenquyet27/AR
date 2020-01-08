@@ -8,7 +8,7 @@ from objloader_simple import OBJ
 MIN_MATCHES = 30
 
 
-image_plane_width = 1280
+image_plane_width = 640
 image_plane_height = 480
 
 
