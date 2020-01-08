@@ -13,8 +13,8 @@ class ReferencePlane(object):
 
         # TODO: using more planar
         self.ref_plane = cv2.imread(os.path.join(os.getcwd(), plane_path))
-
-        self.image_ref = image_proc(cv2.resize(self.ref_plane, (150,300)), 1)
+        # Set size of image in dataset if you want. Change here (230,300)
+        self.image_ref = image_proc(cv2.resize(self.ref_plane, (230,300)), 1)
         self.height, self.width = self.image_ref.shape
 
         self.keypoints, self.descriptors = self.orb.detectAndCompute(

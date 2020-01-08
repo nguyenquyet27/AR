@@ -37,12 +37,6 @@ class ARModel(object):
         return self.descriptors
 
     def set_matches(self, reference_plane):
-        """
-
-        """
-        # self.matches = self.bf.match(
-        #     reference_plane.descriptors, self.descriptors)
-        # self.matches = sorted(self.matches, key=lambda x: x.distance)
         self.matches = self.flann.knnMatch(
             reference_plane.get_descriptors(), self.descriptors, k=2)
         self.matches = [m[0] for m in self.matches if len(
