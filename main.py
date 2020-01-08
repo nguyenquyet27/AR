@@ -1,5 +1,6 @@
 import cv2
 import time
+import argparse
 import numpy as np
 
 from ar_model import ARModel
@@ -46,14 +47,14 @@ def project_3d_model_to_target_plane(ref, target):
 
 
 if __name__ == "__main__":
-    import argparse
+    
 
     # Parse command line arguments
     ap = argparse.ArgumentParser()
     ap.add_argument('-vb', default=str(0),
                     help="lookup cv2.VideoCapture for video backend parameters")
     args = ap.parse_args()
-
+    start_time = time.time()
     cap = cv2.VideoCapture(int(args.vb))
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.image_plane_width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.image_plane_height)
@@ -94,6 +95,8 @@ if __name__ == "__main__":
         len(target.get_matches()), config.MIN_MATCHES))
 
         cv2.imshow('Frame', frame_read)
+        end_time = time.time()
+        print ('total run-time: %f ms' % ((end_time - start_time) * 1000))
         if cv2.waitKey(50) == 27:
             break
 
