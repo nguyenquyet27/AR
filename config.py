@@ -5,10 +5,10 @@ import cv2
 from reference_plane import ReferencePlane
 from objloader_simple import OBJ
 
-MIN_MATCHES = 30
+MIN_MATCHES = 20
 
 
-image_plane_width = 640
+image_plane_width = 1280
 image_plane_height = 480
 
 
