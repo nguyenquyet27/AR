@@ -1,6 +1,6 @@
 import cv2
-import numpy as np
 import config
+import numpy as np
 
 import process_func as pf
 
@@ -56,7 +56,6 @@ class ARModel(object):
         dst_points = np.float32(
             [self.keypoints[m.trainIdx].pt for m in self.matches]).reshape(-1, 1, 2)
 
-        # TODO so 4.0 do lam gi vay?
         H, mask = cv2.findHomography(src_points, dst_points, cv2.RANSAC, 10.0)
 
         self.homography = H
