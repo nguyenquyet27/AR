@@ -22,7 +22,7 @@ pickleshare==0.7.5
 pip-autoremove==0.9.1
 pycodestyle==2.5.0
 pygame==1.9.6
-Pygments==2.4.2
+Pygments==2.7.4
 pylint==2.4.4
 PyOpenGL==3.1.4
 pyparsing==2.4.5
